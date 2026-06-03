@@ -1,0 +1,466 @@
+﻿@page "/"
+@layout NullLayout
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+
+<PageTitle>To-Do List App</PageTitle>
+
+<div class="app-wrapper">
+    <header class="top-navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <span class="brand-icon">✅</span>
+                <span class="brand-text">To-Do List App</span>
+            </div>
+            <nav class="navbar-links">
+                <a href="" class="nav-link active">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Task 3: Dynamic Task Orchestrator</h2>
+                <p class="subtitle">Manage items seamlessly using reactive data lists</p>
+            </div>
+
+            <div class="card-body">
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="taskInput">New Task Description:</label>
+                        <div class="input-wrapper">
+                            <input type="text"
+                                   id="taskInput"
+                                   @bind="newTaskText"
+                                   @onkeyup="HandleKeyUp"
+                                   placeholder="What needs to be done?..."
+                                   class="form-control" />
+                            <button class="btn btn-add" @onclick="AddTask">Add Task</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-meta">
+                    <h3>Current Tasks (@taskList.Count)</h3>
+                    @if (taskList.Count > 0)
+                    {
+                        <button class="btn btn-clear" @onclick="ClearAllTasks">Clear All</button>
+                    }
+                </div>
+
+                <div class="tasks-container">
+                    @if (taskList.Count == 0)
+                    {
+                        <div class="empty-box animate-fade-in">
+                            <span class="placeholder-text">✨ No tasks remaining! Enjoy your free time.</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="task-list">
+                            @foreach (var task in taskList)
+                            {
+                                <li class="task-item animate-fade-in">
+                                    <div class="task-content">
+                                        <span class="bullet-point">✦</span>
+                                        <span class="task-text">@task</span>
+                                    </div>
+                                    <button class="btn-delete" @onclick="() => RemoveTask(task)">✕</button>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p class="developer-credit">Developed by <span class="dev-name">Abdul Rehman Ali</span></p>
+            <p class="assignment-info">VP Lab Work &bull; Assignment 4 &bull; Task 3</p>
+        </div>
+    </footer>
+</div>
+
+@code {
+    // Two-way bound field property context
+    private string newTaskText = string.Empty;
+
+    // Internal reactive standard data collection array object source
+    private List<string> taskList = new();
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskText))
+        {
+            taskList.Add(newTaskText.Trim());
+            newTaskText = string.Empty; // Zeroes out the active field binding state
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            AddTask();
+        }
+    }
+
+    private void RemoveTask(string task)
+    {
+        taskList.Remove(task);
+    }
+
+    private void ClearAllTasks()
+    {
+        taskList.Clear();
+    }
+}
+
+@code {
+    private class NullLayout : LayoutComponentBase
+    {
+        protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+        {
+            builder.AddContent(0, Body);
+        }
+    }
+}
+
+<style>
+    /* Global Layout Setup */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #f4f7f6 !important; /* Soft mint gray tint background */
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        height: 100%;
+    }
+
+    .app-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Premium Header (Pushed to Edges) */
+    .top-navbar {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .navbar-container {
+        width: 100%;
+        padding: 0.75rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .brand-icon {
+        font-size: 1.5rem;
+    }
+
+    .brand-text {
+        font-size: 1.3rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, #0f766e, #14b8a6); /* Emerald to Mint gradient */
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .navbar-links .nav-link {
+        color: #0f766e;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        background-color: rgba(15, 118, 110, 0.06);
+        transition: all 0.2s;
+    }
+
+    .navbar-links .nav-link:hover {
+        background-color: rgba(15, 118, 110, 0.12);
+    }
+
+    /* Content Layout Card */
+    .container {
+        flex: 1 0 auto;
+        width: 100%;
+        max-width: 700px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #0f766e, #14b8a6);
+        color: white;
+        padding: 2.25rem 2rem;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .card-body {
+        padding: 2.5rem 2rem;
+    }
+
+    /* Input Actions Layout Controls */
+    .input-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .input-group label {
+        font-weight: 600;
+        color: #4b5563;
+        font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .form-control {
+        display: block !important;
+        flex: 1;
+        box-sizing: border-box !important;
+        padding: 0.9rem 1.1rem !important;
+        font-size: 1.05rem !important;
+        border: 2px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        transition: all 0.2s ease-in-out;
+        outline: none !important;
+        height: auto !important;
+        background-color: #ffffff !important;
+        color: #1f2937;
+    }
+
+    .form-control:focus {
+        border-color: #14b8a6 !important;
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12) !important;
+    }
+
+    /* Core Action Buttons Setup */
+    .btn {
+        padding: 0.9rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .btn-add {
+        background: #0f766e;
+        color: white;
+        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15);
+    }
+
+    .btn-add:hover {
+        background: #115e59;
+    }
+
+    .btn-add:active {
+        transform: scale(0.98);
+    }
+
+    /* List Meta Elements */
+    .list-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .list-meta h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .btn-clear {
+        background-color: #ef4444;
+        color: white;
+        padding: 0.45rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-clear:hover {
+        background-color: #dc2626;
+    }
+
+    /* Dynamic Output Node Framework Components */
+    .tasks-container {
+        min-height: 100px;
+    }
+
+    .empty-box {
+        background-color: #f8fafc;
+        border: 2px dashed #e2e8f0;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .placeholder-text {
+        color: #94a3b8;
+        font-style: italic;
+        font-size: 1rem;
+    }
+
+    .task-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .task-item {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .task-item:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .task-content {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .bullet-point {
+        color: #14b8a6;
+        font-weight: bold;
+    }
+
+    .task-text {
+        color: #334155;
+        font-size: 1.05rem;
+        word-break: break-word;
+    }
+
+    .btn-delete {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .btn-delete:hover {
+        color: #ef4444;
+        background-color: #fef2f2;
+    }
+
+    /* Sticky Footer Custom Elements */
+    .app-footer {
+        flex-shrink: 0;
+        background-color: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 1.5rem 2rem;
+        text-align: center;
+        margin-top: auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .footer-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .developer-credit {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #475569;
+        font-weight: 500;
+    }
+
+    .dev-name {
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    .assignment-info {
+        margin: 0.35rem 0 0 0;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Render Animations */
+    .animate-fade-in {
+        animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
